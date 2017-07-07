@@ -16,11 +16,11 @@ function getIssPosition() {
       var issPos = {
         "lat": result.iss_position.latitude,
         "lng": result.iss_position.longitude
-      }
+      };
       //console.log("issPos=", issPos);
       return issPos;
     }
-  )
+  );
 }
 
 //getIssPosition();
@@ -36,11 +36,11 @@ function getAddressPosition(address) {
       var address = {
         "lat" : result.results[0].geometry.location.lat,
         "lng" : result.results[0].geometry.location.lng
-      }
+      };
       //console.log("address=",address);
       return address;
     }
-  )
+  );
 }
 
 //getAddressPosition("1907 Maurice-Lebel, Montreal, Quebec");
@@ -51,15 +51,15 @@ function getCurrentTemperatureAtPosition(position) {
   //console.log(formattedRequest);
 
   return request(formattedRequest)
-    .then(
-      function(response) {
-          var result = JSON.parse(response);
-          //console.log(result);
-          var temperature = result.currently.temperature;
-          //console.log(temperature);
-          return temperature;
-      }
-    )
+  .then(
+    function(response) {
+        var result = JSON.parse(response);
+        //console.log(result);
+        var temperature = result.currently.temperature;
+        //console.log(temperature);
+        return temperature;
+    }
+  );
 }
 
 /*
@@ -74,7 +74,7 @@ function getCurrentTemperature(address) {
     function (position) {
       return getCurrentTemperatureAtPosition(position);
     }
-  )
+  );
 }
 
 var myAddress = "1907 Maurice-Lebel, Montreal, Quebec";
@@ -87,7 +87,7 @@ function getDistanceFromIss(address) {
       //console.log("Distance=",getDistance(data[0],data[1]));
       return getDistance(data[0],data[1]);
     }
-  )
+  );
 }
 
 getDistanceFromIss(myAddress);
