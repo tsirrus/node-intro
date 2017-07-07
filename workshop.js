@@ -23,7 +23,7 @@ function getIssPosition() {
   )
 }
 
-getIssPosition();
+//getIssPosition();
 
 function getAddressPosition(address) {
   var formattedAddress = address.replace(/ /g,"+");
@@ -46,12 +46,21 @@ function getAddressPosition(address) {
   )
 }
 
-getAddressPosition("1907 Maurice-Lebel, Montreal, Quebec");
+//getAddressPosition("1907 Maurice-Lebel, Montreal, Quebec");
 //getAddressPosition("1600+Amphitheatre+Parkway,+Mountain+View,+CA");
 
 function getCurrentTemperatureAtPosition(position) {
-
+  var formattedRequest = "https://api.darksky.net/forecast/56c3d30b602ef7ec8a9e56fd71d269b9/" + position.lat + ',' + position.lng;
+  return request(formattedRequest)
+    .then(
+      function(response) {
+          var result = JSON.parse(response);
+          console.log(result);
+      }
+    )
 }
+
+getCurrentTemperatureAtPosition(getAddressPosition("1907 Maurice-Lebel, Montreal, Quebec"));
 
 function getCurrentTemperature(address) {
 
