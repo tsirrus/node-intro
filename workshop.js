@@ -17,7 +17,7 @@ function getIssPosition() {
         "lat": result.iss_position.latitude,
         "lng": result.iss_position.longitude
       }
-      console.log("issPos=", issPos);
+      //console.log("issPos=", issPos);
       return issPos;
     }
   )
@@ -31,16 +31,13 @@ function getAddressPosition(address) {
   .then(
     function(response) {
       var result = JSON.parse(response);
-      console.log("Query=",formattedAddress);
-      //var results = result.results[0];
-      //var geometry = results;
-      //console.log("Geometry=",geometry);
+      //console.log("Query=",formattedAddress);
 
       var address = {
         "lat" : result.results[0].geometry.location.lat,
         "lng" : result.results[0].geometry.location.lng
       }
-      console.log("address=",address);
+      //console.log("address=",address);
       return address;
     }
   )
@@ -51,21 +48,46 @@ function getAddressPosition(address) {
 
 function getCurrentTemperatureAtPosition(position) {
   var formattedRequest = "https://api.darksky.net/forecast/56c3d30b602ef7ec8a9e56fd71d269b9/" + position.lat + ',' + position.lng;
+  //console.log(formattedRequest);
+
   return request(formattedRequest)
     .then(
       function(response) {
           var result = JSON.parse(response);
-          console.log(result);
+          //console.log(result);
+          var temperature = result.currently.temperature;
+          //console.log(temperature);
+          return temperature;
       }
     )
 }
 
-getCurrentTemperatureAtPosition(getAddressPosition("1907 Maurice-Lebel, Montreal, Quebec"));
+/*
+var position = { lat: 45.53502, lng: -73.66811679999999 };
+getCurrentTemperatureAtPosition(position);
+*/
 
 function getCurrentTemperature(address) {
-
+  //console.log("Temp address=", address);
+  return getAddressPosition(address)
+  .then(
+    function (position) {
+      return getCurrentTemperatureAtPosition(position);
+    }
+  )
 }
+
+var myAddress = "1907 Maurice-Lebel, Montreal, Quebec";
+getCurrentTemperature(myAddress);
 
 function getDistanceFromIss(address) {
-
+  return Promise.all([getAddressPosition(address),getIssPosition()])
+  .then(
+    function (data) {
+      //console.log("Distance=",getDistance(data[0],data[1]));
+      return getDistance(data[0],data[1]);
+    }
+  )
 }
+
+getDistanceFromIss(myAddress);
