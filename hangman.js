@@ -14,7 +14,7 @@ function requestRandomWord(dictionaryDefFlag,minLength, maxLength){
     .then(function (response){
         var result = JSON.parse(response);
         //console.log('Random word is:',result.word); //Test
-        return result.word;
+        return result.word.toLowerCase();
     })
     .catch(function(error) {
         console.error('Oops, something went wrong in the dictionary-dive, try again!');
@@ -22,6 +22,22 @@ function requestRandomWord(dictionaryDefFlag,minLength, maxLength){
 }
 
 //requestRandomWord(true,5,-1);  //Test
+
+function isLetter(input) {
+    //console.log('isLetter=',input); //Test
+    var letters = input.match(/[a-zA-Z]+/);
+    //console.log(letters); //Test
+    if (letters !== null) {
+        var letter = letters[0];
+        if (letter.length > 0){
+            return true;
+        }
+    }
+    return false;
+}
+
+//console.log(isLetter('-')); //Test
+
 
 function queryChoice(tries) {
     var questionChoice = [{
@@ -43,18 +59,14 @@ function queryLetter(pickedArray) {
         name: 'letter',
         message: 'What is your letter?',
         validate: function (value) {
-            //console.log('value=',value); //Test
-            var lettersPicked = value.match(/[a-zA-Z]+/);
-            console.log('lettersPicked=',lettersPicked); //Test
-            var letterPicked = lettersPicked[0][0].toLowerCase();
-            console.log('letterpicked=',letterPicked);
-            if(letterPicked.length > 0) {
+            var letterPicked = value[0].toLowerCase();
+            if(isLetter(letterPicked)) {
                 for (var i in pickedArray) {
                     if (letterPicked === pickedArray[i]) {
                         return 'You already picked ' + letterPicked + ', pick another letter';
                     }
                 }
-                console.log('You picked',letterPicked);
+                //console.log('You picked',letterPicked); //Test
                 return true;
             }
             else {
@@ -65,9 +77,7 @@ function queryLetter(pickedArray) {
     
     return inquirer.prompt(questionLetter)
     .then(function (answer) {
-        //console.log('Letter-pickedLetter=', pickedLetter); //Test
-        //var theLetter = pickedLetter.letter;
-        return answer.letter;
+        return answer.letter[0].toLowerCase();
     });
 }
 
@@ -75,20 +85,7 @@ function queryWord (pickedArray) {
     var questionWord = [{
         type: 'input',
         name: 'word',
-        message: 'What is your word?',
-        validate: function (value) {
-            //console.log('value=',value); //Test
-            var wordPicked = value.match(/[a-zA-Z]+/);
-            console.log('wordPicked=',wordPicked);
-            if(wordPicked[0].length > 0) {
-                var lowerCasedWordPicked = wordPicked[0].toLowerCase();
-                console.log('You guessed the word', lowerCasedWordPicked);
-                return true;
-            }
-            else {
-                return 'Guess a valid word';
-            }
-        }
+        message: 'What is your word?'
     }];
     
     return inquirer.prompt(questionWord)
@@ -97,31 +94,61 @@ function queryWord (pickedArray) {
     });
 }
 
-function runHangman(tries, answer, pickedArray) {
-    //console.log('tries=',tries); //Test
-    console.log('answer=',answer); //Test
-    console.log('pickedArray=',pickedArray); //Test
+function validateHangman (answer, pickedArray) {
+    var hangmanWord = '';
+    var hangmanPicked = '';
+    var isFilled = true;
     
-    var triesLeft = tries;
-
-    var questionWord = [{
-        type: 'input',
-        name: 'word',
-        message: 'What is your word?',
-        validate: function (value) {
-            //console.log('value=',value); //Test
-            var wordPicked = value.match(/[a-zA-Z]+/);
-            console.log('wordPicked=',wordPicked);
-            if(wordPicked[0].length > 0) {
-                var lowerCasedWordPicked = wordPicked[0].toLowerCase();
-                console.log('You guessed the word', lowerCasedWordPicked);
-                return true;
+    for (var i in answer) {
+        var theLetter = answer[i];
+        //console.log("theLetter=",theLetter); //Test
+        if (isLetter(theLetter)) {
+            var isFound = false;
+            for (var j in pickedArray) {
+                if (theLetter === pickedArray[j]) {
+                    isFound = true;
+                    break;
+                }
+            }
+            if (isFound) {
+                hangmanWord += theLetter + ' ';
             }
             else {
-                return 'Guess a valid word';
+                hangmanWord += '_' + ' ';
+                isFilled = false;
             }
         }
-    }];
+        else {
+            hangmanWord += theLetter + ' ';
+        }
+    }
+    
+    for (var i in pickedArray) {
+        hangmanPicked += pickedArray[i] + ',';
+    }
+    
+    console.log('Find the word! ', hangmanWord);
+    console.log('What you picked so far:', hangmanPicked);
+    return isFilled;
+}
+
+function runHangman(tries, answer, pickedArray) {
+    //console.log('tries=',tries); //Test
+    //console.log('answer=',answer); //Test
+    //console.log('pickedArray=',pickedArray); //Test
+    
+    var triesLeft = tries;
+    
+    if (triesLeft === 0) {
+        console.log("Out of tries, too bad!");
+        console.log('The word was', answer);
+        return false;
+    }
+    
+    if(validateHangman(answer,pickedArray)) {
+        console.log('Congrats! you correctly guessed the word!', answer);
+        return true;
+    }
     
     return queryChoice(tries)
     .then(function (pickedChoice) {
@@ -169,3 +196,4 @@ function main(){
 }
 
 main();
+
