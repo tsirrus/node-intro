@@ -39,7 +39,6 @@ function guessTheNumber(tries, answer){
     
     return inquirer.prompt(question)
     .then(function( response ) {
-    // Use user feedback for... whatever!!
         var pickedNumber = response.number;
         if (response.number % 1 !== 0) {
             pickedNumber = Math.round(response.number);
